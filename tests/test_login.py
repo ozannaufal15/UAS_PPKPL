@@ -4,7 +4,7 @@ from appium.options.common.base import AppiumOptions
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
-from .utilities.env import *
+from utilities.env import *
 
 import time
 
@@ -54,17 +54,17 @@ class TestLogin(unittest.TestCase):
 
     def handleCaptcha(self) -> bool:
         if (len(self.driver.find_elements(by=AppiumBy.XPATH, value='//android.widget.TextView[@text="Verification"]')) > 0):
-            try:
-                WebDriverWait(self.driver, 30).until(expected_conditions.presence_of_element_located((
-                    AppiumBy.XPATH, '//android.widget.CheckBox[@text="Verify you are human"]')))
-                time.sleep(10)
-                el1 = self.driver.find_element(
-                    by=AppiumBy.XPATH, value='//android.widget.CheckBox[@text="Verify you are human"]')
-                el1.click()
-                time.sleep(10)
-                return False
-            except:
-                return False
+            time.sleep(10)
+            time.sleep(10)
+            time.sleep(10)
+            el1 = self.driver.find_elements(
+                by=AppiumBy.XPATH, value='//android.widget.CheckBox[@text="Verify you are human"]')
+            if (len(el1) > 0):
+                el1[0].click()
+            else:
+                self.driver.back()
+            time.sleep(10)
+            return False
         else:
             return True
 

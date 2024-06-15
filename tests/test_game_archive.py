@@ -2,6 +2,8 @@ import unittest
 from appium import webdriver
 from appium.options.common.base import AppiumOptions
 from appium.webdriver.common.appiumby import AppiumBy
+from utilities.env import *
+from utilities.login_helper import *
 
 import time
 
@@ -14,26 +16,85 @@ capabilities = {
     "appium:language": "en",
     "appium:locale": "US",
     "appium:automationName": "uiautomator2",
-    "noReset": False
+    "appium:noReset": True,
+    "appium:autoGrantPermissions": True,
+    "appium:forceAppLaunch": True
 }
 
 appium_server_url = 'http://127.0.0.1:4723'
 options = AppiumOptions().load_capabilities(capabilities)
+login = LoginHelper()
+login.login(appium_server_url, options, EMAIL_GOOGLE_LOGIN)
+# login.checkUser(USERNAME_GOOGLE_LOGIN)
 
 
 class TestGameArchived(unittest.TestCase):
     def setUp(self) -> None:
         self.driver = webdriver.Remote(appium_server_url, options=options)
+        el1 = self.driver.find_element(
+            by=AppiumBy.ACCESSIBILITY_ID, value="Mastery")
+        el1.click()
+        time.sleep(2)
+        el2 = self.driver.find_element(
+            by=AppiumBy.XPATH, value='//android.widget.TextView[@resource-id="com.chess:id/tileTxt" and @text="Analysis"]')
+        el2.click()
+        time.sleep(2)
+        el3 = self.driver.find_element(
+            by=AppiumBy.XPATH, value='//android.widget.TextView[@resource-id="com.chess:id/tileTxt" and @text="Game Archive"]')
+        el3.click()
+        time.sleep(5)
 
     def tearDown(self) -> None:
         if self.driver:
             self.driver.quit()
 
     def test_game_archived_filter_no_games(self) -> None:
-        pass
+        el4 = self.driver.find_element(
+            by=AppiumBy.XPATH, value='//android.widget.ImageView[@content-desc="Search"]')
+        el4.click()
+        time.sleep(2)
+        el5 = self.driver.find_element(
+            by=AppiumBy.XPATH, value='//android.widget.Button[@resource-id="com.chess:id/resultDrawButton"]')
+        el5.click()
+        time.sleep(2)
+        el6 = self.driver.find_element(
+            by=AppiumBy.XPATH, value='//android.widget.FrameLayout[@resource-id="com.chess:id/searchButton"]')
+        el6.click()
+        time.sleep(5)
+        el7 = self.driver.find_elements(
+            by=AppiumBy.XPATH, value='//android.widget.TextView[@resource-id="com.chess:id/noResultsTxt"]')
+        assert len(el7) > 0
 
     def test_game_archived_filter(self) -> None:
-        pass
+        el4 = self.driver.find_element(
+            by=AppiumBy.XPATH, value='//android.widget.ImageView[@content-desc="Search"]')
+        el4.click()
+        time.sleep(2)
+        el5 = self.driver.find_element(
+            by=AppiumBy.XPATH, value='//android.widget.Button[@resource-id="com.chess:id/gameTypeBlitzButton"]')
+        el5.click()
+        time.sleep(2)
+        el6 = self.driver.find_element(
+            by=AppiumBy.XPATH, value='//android.widget.Button[@resource-id="com.chess:id/resultWonButton"]')
+        el6.click()
+        time.sleep(2)
+        el7 = self.driver.find_element(
+            by=AppiumBy.XPATH, value='//android.widget.FrameLayout[@resource-id="com.chess:id/searchButton"]')
+        el7.click()
+        time.sleep(5)
+        el8 = self.driver.find_element(
+            by=AppiumBy.XPATH, value='//android.widget.TextView[@resource-id="com.chess:id/finishedOpponentUsername"]')
+        assert el8.text == "vasaa77"
 
     def test_game_archived_analysis(self) -> None:
-        pass
+        el4 = self.driver.find_element(by=AppiumBy.XPATH,
+                                       value='//androidx.recyclerview.widget.RecyclerView[@resource-id="com.chess:id/recyclerView"]/android.view.ViewGroup')
+        el4.click()
+        time.sleep(2)
+        el5 = self.driver.find_elements(
+            by=AppiumBy.XPATH, value='//android.widget.TextView[@text="Analysis"]')
+        assert len(el5) > 0
+
+
+if __name__ == '__main__':
+    unittest.main(verbosity=2)

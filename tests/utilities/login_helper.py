@@ -1,4 +1,3 @@
-from .env import *
 from appium import webdriver
 from appium.options.common.base import AppiumOptions
 from appium.webdriver.common.appiumby import AppiumBy
@@ -20,21 +19,32 @@ class LoginHelper(object):
 
     def handleCaptcha(self) -> None:
         if (len(self.driver.find_elements(by=AppiumBy.XPATH, value='//android.widget.TextView[@text="Verification"]')) > 0):
-            try:
-                WebDriverWait(self.driver, 30).until(expected_conditions.presence_of_element_located((
-                    AppiumBy.XPATH, '//android.widget.CheckBox[@text="Verify you are human"]')))
-                time.sleep(10)
-                el1 = self.driver.find_element(
-                    by=AppiumBy.XPATH, value='//android.widget.CheckBox[@text="Verify you are human"]')
-                el1.click()
-                time.sleep(10)
-                return False
-            except:
-                return False
+            time.sleep(10)
+            time.sleep(10)
+            time.sleep(10)
+            el1 = self.driver.find_elements(
+                by=AppiumBy.XPATH, value='//android.widget.CheckBox[@text="Verify you are human"]')
+            if (len(el1) > 0):
+                el1[0].click()
+            else:
+                self.driver.back()
+            time.sleep(10)
+            return False
         else:
             return True
 
-    def login(self, url, options) -> None:
+    def checkUser(self, expected_user) -> bool:
+        if not self.driver:
+            self.driver = webdriver.Remote(url, options=options)
+        el1 = self.driver.find_element(
+            by=AppiumBy.XPATH, value='//android.widget.ImageView[@resource-id="com.chess:id/menu_item_avatar"]')
+        el1.click()
+        time.sleep(2)
+        el2 = self.driver.find_element(
+            by=AppiumBy.XPATH, value='//android.widget.TextView[@resource-id="com.chess:id/usernameTxt"]')
+        return el2.text == expected_user
+
+    def login(self, url, options, emailgoogle) -> None:
         self.driver = webdriver.Remote(url, options=options)
         if (self.isLoggedIn() == False):
             tries = 0
@@ -52,7 +62,7 @@ class LoginHelper(object):
                 el3.click()
                 time.sleep(2)
                 el4 = self.driver.find_element(
-                    by=AppiumBy.XPATH, value=f'//android.widget.TextView[@resource-id="com.google.android.gms:id/account_name" and @text="{EMAIL_GOOGLE_LOGIN}"]')
+                    by=AppiumBy.XPATH, value=f'//android.widget.TextView[@resource-id="com.google.android.gms:id/account_name" and @text="{emailgoogle}"]')
                 el4.click()
                 time.sleep(5)
                 if (self.handleCaptcha() or tries > 5):

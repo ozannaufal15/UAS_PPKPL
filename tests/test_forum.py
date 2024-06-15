@@ -37,6 +37,3 @@ class TestForum(unittest.TestCase):
 
     def test_post_success(self) -> None:
         pass
-
-    def test_thread_add_comment(self) -> None:
-        pass
