@@ -18,20 +18,32 @@ capabilities = {
     "appium:automationName": "uiautomator2",
     "appium:noReset": True,
     "appium:autoGrantPermissions": True,
-    "appium:forceAppLaunch": True
+    "appium:forceAppLaunch": True,
+    "uiautomator2ServerInstallTimeout": 60000
 }
 
 appium_server_url = 'http://127.0.0.1:4723'
 options = AppiumOptions().load_capabilities(capabilities)
-login = LoginHelper()
-login.login(appium_server_url, options, EMAIL_GOOGLE_LOGIN)
-# if driver:
-#     driver.quit()
 
 
 class TestMessage(unittest.TestCase):
+    @classmethod
+    def setUpClass(self) -> None:
+        login = LoginHelper()
+        if (login.isLoggedIn(appium_server_url, options) == True):
+            if (login.checkUser(appium_server_url, options, USERNAME_GOOGLE_LOGIN) == False):
+                login.logout(appium_server_url, options)
+                login.login(appium_server_url, options, EMAIL_GOOGLE_LOGIN)
+        else:
+            login.login(appium_server_url, options, EMAIL_GOOGLE_LOGIN)
+
     def setUp(self) -> None:
         self.driver = webdriver.Remote(appium_server_url, options=options)
+        if (len(self.driver.find_elements(by=AppiumBy.XPATH, value='//android.widget.TextView[@text="No, thank you"]')) > 0):
+            el6 = self.driver.find_element(
+                by=AppiumBy.XPATH, value='//android.widget.TextView[@text="No, thank you"]')
+            el6.click()
+            time.sleep(2)
 
     def tearDown(self) -> None:
         if self.driver:

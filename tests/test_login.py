@@ -17,7 +17,8 @@ capabilities = {
     "appium:language": "en",
     "appium:locale": "US",
     "appium:automationName": "uiautomator2",
-    "appium:autoGrantPermissions": True
+    "appium:autoGrantPermissions": True,
+    "uiautomator2ServerInstallTimeout": 60000
 }
 
 appium_server_url = 'http://127.0.0.1:4723'
@@ -156,3 +157,7 @@ class TestLogin(unittest.TestCase):
             time.sleep(2)
 
         assert self.checkUser(USERNAME_USER_1)
+
+
+if __name__ == '__main__':
+    unittest.main(verbosity=2)
